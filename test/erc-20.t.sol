@@ -16,6 +16,14 @@ contract MyTokenTest is Test {
         assertEq(token.totalSupply(), 1000000 * 10 ** token.decimals());
     }
 
+    function testTransfer() public {
+        address recipient = address(0x1);
+        uint256 amount = 100 * 10 ** token.decimals();
+
+        token.transfer(recipient, amount);
+        assertEq(token.balanceOf(recipient), amount);
+    }
+
     function testPauseAndUnpause() public {
         token.pause();
         assertTrue(token.paused());
@@ -32,5 +40,13 @@ contract MyTokenTest is Test {
         vm.prank(nonOwner);
         vm.expectRevert();
         token.pause(); // This should revert since nonOwner is not the owner
+    }
+
+    function testOnlyOwnerCanUnpause() public {
+        token.pause();
+        address nonOwner = address(0x2);
+        vm.prank(nonOwner);
+        vm.expectRevert();
+        token.unpause(); // This should revert since nonOwner is not the owner
     }
 }
